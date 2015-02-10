@@ -68,7 +68,7 @@ def main(argv=sys.argv):
 		wmode = 'a'
 	else:
 		wmode = 'w'
-	if ext == ".zip" or ext == ".jar":
+	if ext == ".zip" or ext == ".jar" or ext == ".war":
 		zf = zipfile.ZipFile(options.out, wmode)
 		zf.write(fname, zpath)
 		zf.close()
