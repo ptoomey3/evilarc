@@ -41,28 +41,33 @@ def main(argv=sys.argv):
 	p.set_default("depth", 8)
 	p.add_option('--os', '-o', dest="platform", help="OS platform for archive (win|unix). Defaults to win.")
 	p.set_default("platform", "win")
-	p.add_option('--path', '-p', dest="path", help="Path to include in filename after traversal.  Ex: WINDOWS\\System32\\")	
-	p.set_default("path", "")
+	p.add_option('--prepend-path', '-p', dest="prepend", help="Path to include in filename before traversal.  Ex: WINDOWS\\System32\\")
+	p.add_option('--append-path', '-a', dest="append", help="Path to include in filename after traversal.  Ex: WINDOWS\\System32\\")
+	p.set_default("prepend", "")
+	p.set_default("append", "")
 	options, arguments = p.parse_args()
 	
-	if len(arguments) != 1:
+	if len(arguments) < 1:
 		p.error("Incorrect arguments")
 		
-	fname = arguments[0]
-	if not os.path.exists(fname):
-		sys.exit("Invalid input file")
+	for fname in arguments:
+		if not os.path.exists(fname):
+			sys.exit("Invalid input file")
 		
 	if options.platform == "win":
 		dir = "..\\"
-		if options.path and options.path[-1] != '\\':
-			options.path += '\\'
+		if options.prepend and options.prepend[-1] != '\\':
+			options.prepend += '\\'
+		if options.append and options.append[-1] != '\\':
+			options.append += '\\'
 	else:
 		dir = "../"
-		if options.path and options.path[-1] != '/':
-			options.path += '/'
-
-	zpath = dir*options.depth+options.path+os.path.basename(fname)
-	print "Creating " + options.out + " containing " + zpath;	
+		if options.prepend and options.prepend[-1] != '/':
+			options.prepend += '/'
+		if options.append and options.append[-1] != '/':
+			options.append += '/'
+	
+	print "Creating " + options.out;
 	ext = os.path.splitext(options.out)[1]
 	if os.path.exists(options.out):
 		wmode = 'a'
@@ -83,7 +88,10 @@ def main(argv=sys.argv):
 		sys.exit("Could not identify output archive format for " + ext)
 
 	tf = tarfile.open(options.out, mode)
-	tf.add(fname, zpath)
+	for fname in arguments:
+		zpath = options.prepend+dir*options.depth+options.append+os.path.basename(fname)
+		print "Adding " + zpath;
+		tf.add(fname, zpath)
 	tf.close()
 
 
