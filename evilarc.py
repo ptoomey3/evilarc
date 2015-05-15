@@ -41,8 +41,10 @@ def main(argv=sys.argv):
 	p.set_default("depth", 8)
 	p.add_option('--os', '-o', dest="platform", help="OS platform for archive (win|unix). Defaults to win.")
 	p.set_default("platform", "win")
-	p.add_option('--path', '-p', dest="path", help="Path to include in filename after traversal.  Ex: WINDOWS\\System32\\")	
-	p.set_default("path", "")
+	p.add_option('--prepend-path', '-p', dest="prepend", help="Path to include in filename before traversal.  Ex: WINDOWS\\System32\\")
+	p.add_option('--append-path', '-a', dest="append", help="Path to include in filename after traversal.  Ex: WINDOWS\\System32\\")
+	p.set_default("prepend", "")
+	p.set_default("append", "")
 	options, arguments = p.parse_args()
 	
 	if len(arguments) != 1:
@@ -54,15 +56,19 @@ def main(argv=sys.argv):
 		
 	if options.platform == "win":
 		dir = "..\\"
-		if options.path and options.path[-1] != '\\':
-			options.path += '\\'
+		if options.prepend and options.prepend[-1] != '\\':
+			options.prepend += '\\'
+		if options.append and options.append[-1] != '\\':
+			options.append += '\\'
 	else:
 		dir = "../"
-		if options.path and options.path[-1] != '/':
-			options.path += '/'
+		if options.prepend and options.prepend[-1] != '/':
+			options.prepend += '/'
+		if options.append and options.append[-1] != '/':
+			options.append += '/'
 
-	zpath = dir*options.depth+options.path+os.path.basename(fname)
-	print "Creating " + options.out + " containing " + zpath;	
+	zpath = options.prepend+dir*options.depth+options.append+os.path.basename(fname)
+	print "Creating " + options.out + " containing " + zpath;
 	ext = os.path.splitext(options.out)[1]
 	if os.path.exists(options.out):
 		wmode = 'a'
