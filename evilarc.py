@@ -62,7 +62,7 @@ def main(argv=sys.argv):
 			options.path += '/'
 
 	zpath = dir*options.depth+options.path+os.path.basename(fname)
-	print "Creating " + options.out + " containing " + zpath;	
+	print("Creating " + options.out + " containing " + zpath);
 	ext = os.path.splitext(options.out)[1]
 	if os.path.exists(options.out):
 		wmode = 'a'
